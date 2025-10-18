@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .permission-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .data-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .permission-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .permission-info {
+            flex: 1;
+        }
+
+        .permission-toggle {
+            margin-left: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .collect-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.3s;
+        }
+
+        .collect-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .data-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-family: monospace;
+        }
+
+        .status-indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .tab.active {
+            background: white;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .permission-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .permission-toggle {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📱 Mfumo wa Usimamizi wa Data ya Simu</h1>
+            <p>Omba ruhusa za kukusanya data kwa lengo la kujifunzia tu</p>
+        </header>
+
+        <div class="permission-box">
+            <h2>🔐 Ruhusa za Data</h2>
+            <div class="permission-item">
+                <div class="permission-info">
+                    <h4>SMS na Ujumbe</h4>
+                    <p>Ruhusa ya kusoma ujumbe wa maandishi na mitandao ya kijamii</p>
+                </div>
+                <div class="permission-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="smsPermission">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="permission-item">
+                <div class="permission-info">
+                    <h4>Simu na Kumbukumbu za Mazungumzo</h4>
+                    <p>Ruhusa ya kusoma historia ya simu za kuingia na kutoka</p>
+                </div>
+                <div class="permission-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="callsPermission">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="permission-item">
+                <div class="permission-info">
+                    <h4>Mawasiliano</h4>
+                    <p>Ruhusa ya kusoma orodha ya majina na nambari za simu</p>
+                </div>
+                <div class="permission-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="contactsPermission">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="permission-item">
+                <div class="permission-info">
+                    <h4>Eneo la Kijiografia</h4>
+                    <p>Ruhusa ya kufuatilia eneo lako la sasa</p>
+                </div>
+                <div class="permission-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="locationPermission">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="collect-btn" onclick="requestPermissions()">💾 Weka Ruhusa Zote</button>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="openTab('sms')">📨 SMS</button>
+            <button class="tab" onclick="openTab('calls')">📞 Simu</button>
+            <button class="tab" onclick="openTab('contacts')">👥 Mawasiliano</button>
+            <button class="tab" onclick="openTab('location')">📍 Eneo</button>
+            <button class="tab" onclick="openTab('database')">💾 Hifadhi</button>
+        </div>
+
+        <!-- SMS Tab -->
+        <div id="sms" class="tab-content active">
+            <div class="data-section">
+                <h3>Usimamizi wa SMS</h3>
+                <p>Hii sehemu inaonyesha jinsi ya kukusanya data ya SMS (kwa ajili ya kujifunzia tu)</p>
+                <button class="collect-btn" onclick="collectSMS()">Kusanya SMS</button>
+                <div class="data-display" id="smsData">
+                    <!-- SMS data will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Calls Tab -->
+        <div id="calls" class="tab-content">
+            <div class="data-section">
+                <h3>Kumbukumbu za Simu</h3>
+                <p>Data ya simu zilizoingia na kutoka</p>
+                <button class="collect-btn" onclick="collectCalls()">Kusanya Simu</button>
+                <div class="data-display" id="callsData">
+                    <!-- Calls data will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Tab -->
+        <div id="contacts" class="tab-content">
+            <div class="data-section">
+                <h3>Orodha ya Mawasiliano</h3>
+                <p>Majina na nambari za simu zilizohifadhiwa</p>
+                <button class="collect-btn" onclick="collectContacts()">Kusanya Mawasiliano</button>
+                <div class="data-display" id="contactsData">
+                    <!-- Contacts data will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Tab -->
+        <div id="location" class="tab-content">
+            <div class="data-section">
+                <h3>Eneo la Sasa</h3>
+                <p>Data ya eneo lako la kijiografia</p>
+                <button class="collect-btn" onclick="collectLocation()">Pata Eneo</button>
+                <div class="data-display" id="locationData">
+                    <!-- Location data will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Tab -->
+        <div id="database" class="tab-content">
+            <div class="data-section">
+                <h3>Hifadhi ya Data</h3>
+                <p>Data zote zilizokusanywa kwenye kumbukumbu ya kijadi</p>
+                <button class="collect-btn" onclick="viewDatabase()">Onyesha Data Zote</button>
+                <button class="collect-btn" onclick="clearDatabase()" style="background: #dc3545;">Futa Data Zote</button>
+                <div class="data-display" id="databaseData">
+                    <!-- All data will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database simulation using localStorage
+        const database = {
+            save: function(key, data) {
+                const existing = this.load(key) || [];
+                const newData = [...existing, ...data];
+                localStorage.setItem(key, JSON.stringify(newData));
+                return newData;
+            },
+            
+            load: function(key) {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            },
+            
+            clear: function(key) {
+                localStorage.removeItem(key);
+            },
+            
+            getAll: function() {
+                const keys = ['sms', 'calls', 'contacts', 'location'];
+                const allData = {};
+                keys.forEach(key => {
+                    allData[key] = this.load(key) || [];
+                });
+                return allData;
+            }
+        };
+
+        // Tab navigation
+        function openTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Permission request
+        function requestPermissions() {
+            const permissions = {
+                sms: document.getElementById('smsPermission').checked,
+                calls: document.getElementById('callsPermission').checked,
+                contacts: document.getElementById('contactsPermission').checked,
+                location: document.getElementById('locationPermission').checked
+            };
+
+            let grantedCount = 0;
+            Object.values(permissions).forEach(permission => {
+                if (permission) grantedCount++;
+            });
+
+            if (grantedCount === 0) {
+                alert('Tafadhali weka angalau ruhusa moja!');
+                return;
+            }
+
+            alert(`Ruhusa ${grantedCount} zimewekwa! Sasa unaweza kukusanya data.`);
+        }
+
+        // SMS Collection (Simulation)
+        function collectSMS() {
+            if (!document.getElementById('smsPermission').checked) {
+                alert('Tafadhali weka ruhusa ya SMS kwanza!');
+                return;
+            }
+
+            const sampleSMS = [
+                { from: "Safaricom", message: "Umepokea Tsh 50,000 kutoka kwa John", timestamp: new Date().toISOString() },
+                { from: "AirTel", message: "Data yako imekaribia kumalizika", timestamp: new Date().toISOString() },
+                { from: "Juma", message: "Habari yako?", timestamp: new Date().toISOString() }
+            ];
+
+            database.save('sms', sampleSMS);
+            displaySMSData();
+            alert('Data ya SMS imekusanywa!');
+        }
+
+        function displaySMSData() {
+            const smsData = database.load('sms') || [];
+            const display = document.getElementById('smsData');
+            display.innerHTML = smsData.map(sms => `
+                <div class="data-item">
+                    <strong>${sms.from}:</strong> ${sms.message}<br>
+                    <small>${new Date(sms.timestamp).toLocaleString()}</small>
+                </div>
+            `).join('');
+        }
+
+        // Calls Collection (Simulation)
+        function collectCalls() {
+            if (!document.getElementById('callsPermission').checked) {
+                alert('Tafadhali weka ruhusa ya simu kwanza!');
+                return;
+            }
+
+            const sampleCalls = [
+                { number: "+255789123456", type: "Incoming", duration: "2:30", timestamp: new Date().toISOString() },
+                { number: "+255713654789", type: "Outgoing", duration: "1:15", timestamp: new Date().toISOString() },
+                { number: "Unknown", type: "Missed", duration: "0:00", timestamp: new Date().toISOString() }
+            ];
+
+            database.save('calls', sampleCalls);
+            displayCallsData();
+            alert('Data ya simu imekusanywa!');
+        }
+
+        function displayCallsData() {
+            const callsData = database.load('calls') || [];
+            const display = document.getElementById('callsData');
+            display.innerHTML = callsData.map(call => `
+                <div class="data-item">
+                    <strong>${call.number}</strong> - ${call.type}<br>
+                    Muda: ${call.duration} | ${new Date(call.timestamp).toLocaleString()}
+                </div>
+            `).join('');
+        }
+
+        // Contacts Collection (Simulation)
+        function collectContacts() {
+            if (!document.getElementById('contactsPermission').checked) {
+                alert('Tafadhali weka ruhusa ya mawasiliano kwanza!');
+                return;
+            }
+
+            const sampleContacts = [
+                { name: "Juma Ali", number: "+255712345678", email: "juma@example.com" },
+                { name: "Mary John", number: "+255765432198", email: "mary@example.com" },
+                { name: "Ahmed Mohamed", number: "+255788765432", email: "ahmed@example.com" }
+            ];
+
+            database.save('contacts', sampleContacts);
+            displayContactsData();
+            alert('Data ya mawasiliano imekusanywa!');
+        }
+
+        function displayContactsData() {
+            const contactsData = database.load('contacts') || [];
+            const display = document.getElementById('contactsData');
+            display.innerHTML = contactsData.map(contact => `
+                <div class="data-item">
+                    <strong>${contact.name}</strong><br>
+                    Simu: ${contact.number}<br>
+                    Barua pepe: ${contact.email}
+                </div>
+            `).join('');
+        }
+
+        // Location Collection (Real API)
+        function collectLocation() {
+            if (!document.getElementById('locationPermission').checked) {
+                alert('Tafadhali weka ruhusa ya eneo kwanza!');
+                return;
+            }
+
+            if (!navigator.geolocation) {
+                alert('Eneo halipatikani kwenye kifaa chako!');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const locationData = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    database.save('location', [locationData]);
+                    displayLocationData();
+                    alert('Eneo limepakuliwa!');
+                },
+                function(error) {
+                    alert('Imeshindikana kupata eneo: ' + error.message);
+                }
+            );
+        }
+
+        function displayLocationData() {
+            const locationData = database.load('location') || [];
+            const display = document.getElementById('locationData');
+            display.innerHTML = locationData.map(loc => `
+                <div class="data-item">
+                    <strong>Latitude:</strong> ${loc.latitude}<br>
+                    <strong>Longitude:</strong> ${loc.longitude}<br>
+                    <strong>Usahihi:</strong> ${loc.accuracy} meters<br>
+                    <strong>Muda:</strong> ${new Date(loc.timestamp).toLocaleString()}
+                </div>
+            `).join('');
+        }
+
+        // Database Management
+        function viewDatabase() {
+            const allData = database.getAll();
+            const display = document.getElementById('databaseData');
+            
+            let html = '';
+            Object.keys(allData).forEach(key => {
+                html += `<h4>${key.toUpperCase()} (${allData[key].length})</h4>`;
+                allData[key].forEach(item => {
+                    html += `<div class="data-item">${JSON.stringify(item)}</div>`;
+                });
+            });
+            
+            display.innerHTML = html;
+        }
+
+        function clearDatabase() {
+            if (confirm('Una uhakika unataka kufuta data zote?')) {
+                localStorage.clear();
+                alert('Data zote zimefutwa!');
+                viewDatabase();
+            }
+        }
+
+        // Initialize display
+        document.addEventListener('DOMContentLoaded', function() {
+            displaySMSData();
+            displayCallsData();
+            displayContactsData();
+            displayLocationData();
+        });
+    </script>
+</body>
+</html>
